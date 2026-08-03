@@ -280,6 +280,9 @@ pub struct ProjectConfig {
     #[serde(default = "default_pkg_dir")]
     pub site_pkg_dir: Utf8PathBuf,
     pub style_file: Option<Utf8PathBuf>,
+    /// whether to bundle CSS files using Lightning CSS
+    #[serde(default)]
+    pub style_bundle: bool,
     /// text file where the hashes of the frontend files are stored
     pub hash_file_name: Option<Utf8PathBuf>,
     /// whether to hash the frontend files content and add them to the file names

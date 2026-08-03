@@ -294,6 +294,12 @@ site-pkg-dir = "pkg"
 # Optional. Env: LEPTOS_STYLE_FILE.
 style-file = "style/main.scss"
 
+# Whether to bundle CSS files with Lightning CSS. If true and `style-file` has the `.css` file extension,
+# the `style-file` and the `.css` files it imports will be bundled into a single CSS file.
+#
+# Optional. Default: false. Env: LEPTOS_STYLE_BUNDLE.
+style-bundle = true
+
 # The tailwind input file.
 #
 # Optional, Activates the tailwind build
