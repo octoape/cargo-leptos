@@ -27,6 +27,7 @@ use tracing::*;
 use walkdir::WalkDir;
 
 const POLLING_TIMEOUT: Duration = Duration::from_millis(100);
+const STYLE_EXTENSIONS: [&str; 3] = ["scss", "sass", "css"];
 
 pub async fn spawn(proj: &Arc<Project>, view_macros: Option<ViewMacros>) -> Result<JoinHandle<()>> {
     let proj = proj.clone();
@@ -187,7 +188,7 @@ fn handle(
 
         if let Some(file) = &proj.style.file {
             let src = file.source.clone().without_last();
-            if path.starts_with(src) && path.is_ext_any(&["scss", "sass", "css"]) {
+            if path.starts_with(src) && path.is_ext_any(&STYLE_EXTENSIONS) {
                 debug!("Notify style change {}", GRAY.paint(path.as_str()));
                 changes.add(Change::Style);
             }
@@ -206,11 +207,16 @@ fn handle(
         }
 
         if path.starts_with_any(&proj.watch_additional_files) {
-            debug!(
-                "Notify additional file change {}",
-                GRAY.paint(path.as_str())
-            );
-            changes.add(Change::Additional);
+            if path.is_ext_any(&STYLE_EXTENSIONS) {
+                debug!("Notify style change {}", GRAY.paint(path.as_str()));
+                changes.add(Change::Style);
+            } else {
+                debug!(
+                    "Notify additional file change {}",
+                    GRAY.paint(path.as_str())
+                );
+                changes.add(Change::Additional);
+            }
         }
     }
 
