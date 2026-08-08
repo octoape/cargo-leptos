@@ -1,6 +1,8 @@
+use serde::Deserialize;
 use std::{ops::Deref, vec};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
 pub enum Change {
     /// sent when a bin target source file is changed
     BinSource,

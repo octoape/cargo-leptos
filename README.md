@@ -341,7 +341,20 @@ js-minify = false
 # A change to any file in those directories will trigger a rebuild.
 #
 # Optional.
-watch-additional-files = ["additional_files", "custom_config.json"]
+watch-additional-files = [
+    # Can either provide a simple path string
+    "additional_files",
+    "custom_config.json",
+    # Or a structure that provides additional control over the watched file behavior
+    {
+        # The watched path
+        path = "additional_styles",
+        # Only watch files with this extension
+        extension = "css",
+        # The type of rebuild to trigger when a file changes
+        change-type = "style"
+    }
+]
 
 # The IP and port where the server serves the content. Use it in your server setup.
 #

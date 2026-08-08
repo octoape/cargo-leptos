@@ -1,3 +1,12 @@
+use super::{
+    assets::AssetsConfig,
+    bin_package::BinPackage,
+    cli::Opts,
+    dotenvs::{load_dotenvs, overlay_env},
+    end2end::End2EndConfig,
+    style::StyleConfig,
+};
+use crate::compile::Change;
 use crate::{
     config::{hash_file::HashFile, lib_package::LibPackage, UnixSignal},
     ext::{PathBufExt, PathExt},
@@ -8,15 +17,6 @@ use camino::{Utf8Path, Utf8PathBuf};
 use cargo_metadata::{Metadata, Package};
 use serde::Deserialize;
 use std::{collections::HashSet, fmt::Debug, net::SocketAddr, sync::Arc, time::Duration};
-
-use super::{
-    assets::AssetsConfig,
-    bin_package::BinPackage,
-    cli::Opts,
-    dotenvs::{load_dotenvs, overlay_env},
-    end2end::End2EndConfig,
-    style::StyleConfig,
-};
 
 /// If the site root path starts with this marker, the marker should be replaced with the Cargo target directory
 pub(super) const CARGO_TARGET_DIR_MARKER: &str = "CARGO_TARGET_DIR";
@@ -41,6 +41,30 @@ pub struct ShutdownPolicy {
     pub unix_signal: UnixSignal,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct WatchAdditional {
+    /// The path to watch
+    pub paths: Vec<Utf8PathBuf>,
+    /// Only watch files with these extensions. If empty, will watch files with any extension.
+    pub extensions: Vec<String>,
+    /// The type of [`Change`] to trigger when a file is modified.
+    pub change_types: Vec<Change>,
+}
+
+impl From<WatchAdditionalConfig> for WatchAdditional {
+    fn from(value: WatchAdditionalConfig) -> Self {
+        match value {
+            WatchAdditionalConfig::Object(value) => value,
+            WatchAdditionalConfig::Path(path) => Self {
+                paths: vec![path],
+                extensions: Default::default(),
+                change_types: vec![Change::Additional],
+            },
+        }
+    }
+}
+
 pub struct Project {
     /// absolute path to the working dir
     pub working_dir: Utf8PathBuf,
@@ -57,7 +81,7 @@ pub struct Project {
     pub end2end: Option<End2EndConfig>,
     pub assets: Option<AssetsConfig>,
     pub js_dir: Utf8PathBuf,
-    pub watch_additional_files: Vec<Utf8PathBuf>,
+    pub watch_additional_files: Vec<WatchAdditional>,
     pub hash_file: HashFile,
     pub hash_files: bool,
     pub js_minify: bool,
@@ -124,7 +148,13 @@ impl Project {
                 .clone()
                 .unwrap_or_else(|| Utf8PathBuf::from("src"));
 
-            let watch_additional_files = config.watch_additional_files.clone().unwrap_or_default();
+            let watch_additional_files = config
+                .watch_additional_files
+                .clone()
+                .unwrap_or_default()
+                .into_iter()
+                .map(|config| config.into())
+                .collect();
 
             let bin = BinPackage::resolve(cli, metadata, &project, &config, bin_args)?;
 
@@ -268,6 +298,15 @@ impl Project {
     }
 }
 
+/// Enum to allow providing the [`ProjectConfig#watch_additional_files`] config as either a string
+/// path or as a [`WatchAdditional`] object.
+#[derive(Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum WatchAdditionalConfig {
+    Object(WatchAdditional),
+    Path(Utf8PathBuf),
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub struct ProjectConfig {
@@ -297,7 +336,7 @@ pub struct ProjectConfig {
     #[serde(default = "default_js_minify")]
     pub js_minify: bool,
     /// additional files to watch. changes triggers rebuilds.
-    pub watch_additional_files: Option<Vec<Utf8PathBuf>>,
+    pub watch_additional_files: Option<Vec<WatchAdditionalConfig>>,
     #[serde(default = "default_reload_port")]
     pub reload_port: u16,
     /// command for launching end-2-end integration tests
