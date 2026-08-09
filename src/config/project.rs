@@ -44,11 +44,11 @@ pub struct ShutdownPolicy {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WatchAdditional {
-    /// The path to watch
+    /// The paths to watch
     pub paths: Vec<Utf8PathBuf>,
     /// Only watch files with these extensions. If empty, will watch files with any extension.
     pub extensions: Vec<String>,
-    /// The type of [`Change`] to trigger when a file is modified.
+    /// The types of [`Change`] to trigger when a file is modified.
     pub change_types: Vec<Change>,
 }
 

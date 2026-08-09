@@ -347,12 +347,13 @@ watch-additional-files = [
     "custom_config.json",
     # Or a structure that provides additional control over the watched file behavior
     {
-        # The watched path
-        path = "additional_styles",
-        # Only watch files with this extension
-        extension = "css",
-        # The type of rebuild to trigger when a file changes
-        change-type = "style"
+        # The watched paths
+        path = ["additional_styles"],
+        # Only watch files with these extensions
+        extension = ["css"],
+        # The types of rebuild to trigger when a file changes.
+        # Possible values: bin-source, lib-source, asset, style, conf, additional.
+        change-type = ["style"]
     }
 ]
 
