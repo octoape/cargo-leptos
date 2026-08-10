@@ -222,6 +222,7 @@ fn handle(
                     .change_types
                     .iter()
                     .for_each(|change| {
+                        debug!("Notify {:?} change {}", change, GRAY.paint(path.as_str()));
                         changes.add(*change);
                     });
             }
