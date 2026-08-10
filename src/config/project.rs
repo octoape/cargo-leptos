@@ -47,6 +47,7 @@ pub struct WatchAdditional {
     /// The paths to watch
     pub paths: Vec<Utf8PathBuf>,
     /// Only watch files with these extensions. If empty, will watch files with any extension.
+    #[serde(default)]
     pub extensions: Vec<String>,
     /// The types of [`Change`] to trigger when a file is modified.
     pub change_types: Vec<Change>,
