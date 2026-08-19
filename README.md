@@ -9,15 +9,15 @@ Build tool for [Leptos](https://crates.io/crates/leptos):
 
 - [Features](#features)
 - [Getting started](#getting-started)
-  - [Dependencies](#dependencies)
+    - [Dependencies](#dependencies)
 - [Single-package setup](#single-package-setup)
 - [Workspace setup](#workspace-setup)
 - [Build features](#build-features)
 - [Parameters reference](#parameters-reference)
-  - [Compilation parameters](#compilation-parameters)
-  - [Site parameters](#site-parameters)
-  - [Environment variables](#environment-variables)
-  - [End-to-end testing](#end-to-end-testing)
+    - [Compilation parameters](#compilation-parameters)
+    - [Site parameters](#site-parameters)
+    - [Environment variables](#environment-variables)
+    - [End-to-end testing](#end-to-end-testing)
 
 <br/>
 
@@ -31,13 +31,17 @@ Build tool for [Leptos](https://crates.io/crates/leptos):
 - CSS transformation and minification using [Lightning CSS](https://lightningcss.dev).
 - Builds server and client (wasm) binaries using Cargo.
 - Generates JS - Wasm bindings with [wasm-bindgen](https://crates.io/crates/wasm-bindgen)
-  - Includes support for [JS Snippets](https://rustwasm.github.io/docs/wasm-bindgen/reference/js-snippets.html#js-snippets) for when you want to call some JS code from your WASM.
+    - Includes support
+      for [JS Snippets](https://rustwasm.github.io/docs/wasm-bindgen/reference/js-snippets.html#js-snippets) for when
+      you want to call some JS code from your WASM.
 - Optimises the wasm with _wasm-opt_ from [Binaryen](https://github.com/WebAssembly/binaryen)
 - `watch` command for automatic rebuilds with browser live-reload.
 - `test` command for running tests of the lib and bin packages that makes up the Leptos project.
 - `build` build the server and client.
-- `end-to-end` command for building, running the server and calling a bash shell hook. The hook would typically launch Playwright or similar.
-- `new` command for creating a new project based on templates, using [cargo-generate](https://cargo-generate.github.io/cargo-generate/index.html).
+- `end-to-end` command for building, running the server and calling a bash shell hook. The hook would typically launch
+  Playwright or similar.
+- `new` command for creating a new project based on templates,
+  using [cargo-generate](https://cargo-generate.github.io/cargo-generate/index.html).
 - 'no_downloads' feature to allow user management of optional dependencies
   <br/>
 
@@ -60,22 +64,28 @@ Help:
 
 > `cargo leptos --help`
 
-For setting up your project, have a look at one of the [templates](https://github.com/orgs/leptos-rs/repositories?q=start) or the [examples](https://github.com/leptos-rs/cargo-leptos/tree/main/examples). You can also use the `cargo leptos new` command to create a new project from a template, see `cargo leptos new --help` for more information.
+For setting up your project, have a look at one of
+the [templates](https://github.com/orgs/leptos-rs/repositories?q=start) or
+the [examples](https://github.com/leptos-rs/cargo-leptos/tree/main/examples). You can also use the `cargo leptos new`
+command to create a new project from a template, see `cargo leptos new --help` for more information.
 
 Current templates include but are not limited to:
-  - [`https://github.com/leptos-rs/start-actix`](https://github.com/leptos-rs/start-actix): An Actix starter
-  - [`https://github.com/leptos-rs/start-axum`](https://github.com/leptos-rs/start-axum): An Axum starter
-  - [`https://github.com/leptos-rs/start-axum-workspace`](https://github.com/leptos-rs/start-axum-workspace): An Axum starter keeping client and server code in separate crates in a workspace
+
+- [`https://github.com/leptos-rs/start-actix`](https://github.com/leptos-rs/start-actix): An Actix starter
+- [`https://github.com/leptos-rs/start-axum`](https://github.com/leptos-rs/start-axum): An Axum starter
+- [`https://github.com/leptos-rs/start-axum-workspace`](https://github.com/leptos-rs/start-axum-workspace): An Axum
+  starter keeping client and server code in separate crates in a workspace
 
 <br/>
 
 ## Dependencies
 
-The dependency for [sass](https://sass-lang.com/install) is automatically installed in a cache directory when they are used if they are not already installed and found by [which](https://crates.io/crates/which).
+The dependency for [sass](https://sass-lang.com/install) is automatically installed in a cache directory when they are
+used if they are not already installed and found by [which](https://crates.io/crates/which).
 Different versions of the dependencies might accumulate in this directory, so feel free to delete it.
 
 | OS      | Example                                   |
-| ------- | ----------------------------------------- |
+|---------|-------------------------------------------|
 | Linux   | /home/alice/.cache/cargo-leptos           |
 | macOS   | /Users/Alice/Library/Caches/cargo-leptos  |
 | Windows | C:\Users\Alice\AppData\Local\cargo-leptos |
@@ -93,7 +103,8 @@ For at least some shells (`bash` and `zsh` are confirmed to work) `cargo` is abl
 commands like `cargo leptos` back to the underlying `cargo-leptos` binary.
 
 For that purpose `cargo-leptos` supports generating completions using `cargo leptos completions <SHELL>`.
-Which you then can install/source for your shell. For bash, the command could like this 
+Which you then can install/source for your shell. For bash, the command could like this
+
 ```bash
 cargo leptos completions bash > "${XDG_DATA_HOME:-"$HOME/.local/share}/bash-completion/completions/cargo-leptos"
 ```
@@ -102,17 +113,20 @@ cargo leptos completions bash > "${XDG_DATA_HOME:-"$HOME/.local/share}/bash-comp
 
 The single-package setup is where the code for both the frontend and the server is defined in a single package.
 
-Configuration parameters are defined in the package `Cargo.toml` section `[package.metadata.leptos]`. See the Parameters reference for
+Configuration parameters are defined in the package `Cargo.toml` section `[package.metadata.leptos]`. See the Parameters
+reference for
 a full list of parameters that can be used. All paths are relative to the package root (i.e. to the `Cargo.toml` file)
 
 <br/>
 
 # Workspace setup
 
-When using a workspace setup both single-package and multi-package projects are supported. The latter is when the frontend
+When using a workspace setup both single-package and multi-package projects are supported. The latter is when the
+frontend
 and the server reside in different packages.
 
-All workspace members whose `Cargo.toml` define the `[package.metadata.leptos]` section are automatically included as Leptos
+All workspace members whose `Cargo.toml` define the `[package.metadata.leptos]` section are automatically included as
+Leptos
 single-package projects. The multi-package projects are defined on the workspace level in the `Cargo.toml`'s
 section `[[workspace.metadata.leptos]]` which takes three mandatory parameters:
 
@@ -261,7 +275,7 @@ disable-erase-components = false
 #
 # Optional. By default, "-Oz", "--enable-bulk-memory" and "--enable-nontrapping-float-to-int"  are used. For all features, consult `wasm-opt --help`.
 # By providing features, you will override the default enabled features.
-wasm-opt-features = ["-Oz","--enable-bulk-memory","--enable-nontrapping-float-to-int"]
+wasm-opt-features = ["-Oz", "--enable-bulk-memory", "--enable-nontrapping-float-to-int"]
 ```
 
 ## Site parameters
@@ -348,12 +362,12 @@ watch-additional-files = [
     # Or a structure that provides additional control over the watched file behavior
     {
         # The watched paths
-        path = ["additional_styles"],
+        paths = ["additional_styles"],
         # Only watch files with these extensions
-        extension = ["css"],
+        extensions = ["css"],
         # The types of rebuild to trigger when a file changes.
         # Possible values: bin-source, lib-source, asset, style, conf, additional.
-        change-type = ["style"]
+        change-types = ["style"]
     }
 ]
 
@@ -461,7 +475,8 @@ Directories used when building:
 
 Note when using directories:
 
-- `cargo-leptos` changes the working directory to the project root or if in a workspace, the workspace root before building and running.
+- `cargo-leptos` changes the working directory to the project root or if in a workspace, the workspace root before
+  building and running.
 - the two are set to the same value when running in a single-package config.
 - Avoid using them at run-time unless you can guarantee that the entire project struct is available at runtime as well.
 
@@ -473,7 +488,10 @@ override the versions `cargo-leptos` should use (e.g. `LEPTOS_SASS_VERSION=1.69.
 
 ### During build
 
-During the build process, `cargo-leptos` injects several environment variables. With [`cross`](https://github.com/cross-rs/cross), only a [subset](https://github.com/cross-rs/cross/wiki/Configuration#environment-variable-passthrough) of environment variables are passed into the container during the build.
+During the build process, `cargo-leptos` injects several environment variables. With [
+`cross`](https://github.com/cross-rs/cross), only
+a [subset](https://github.com/cross-rs/cross/wiki/Configuration#environment-variable-passthrough) of environment
+variables are passed into the container during the build.
 
 For `cross` specifically, you need to add this section to the `Cross.toml` file:
 
@@ -493,7 +511,8 @@ passthrough = [
 ]
 ```
 
-Other tools need to accept the same environment variables. If this is not done correctly, then the WASM files are not linked correctly. See [issue #574](https://github.com/leptos-rs/cargo-leptos/issues/574) for more details.
+Other tools need to accept the same environment variables. If this is not done correctly, then the WASM files are not
+linked correctly. See [issue #574](https://github.com/leptos-rs/cargo-leptos/issues/574) for more details.
 
 ## End-to-end testing
 
@@ -515,11 +534,19 @@ doesn't then please create a GitHub ticket.
 
 `cargo-leptos` supports automatically downloading binary dependencies for tools like `wasm-bindgen-cli`.
 
-`wasm-bindgen-cli` requires a direct match between the patch version of the `wasm-bindgen` crate and the patch version of the `wasm-bindgen-cli` tool. This can sometimes make dependency management more complicated, because it means that `cargo` may resolve your `wasm-bindgen` version to a later patch version of the crate, causing a mismatched with your installed `wasm-bindgen-cli` version.
+`wasm-bindgen-cli` requires a direct match between the patch version of the `wasm-bindgen` crate and the patch version
+of the `wasm-bindgen-cli` tool. This can sometimes make dependency management more complicated, because it means that
+`cargo` may resolve your `wasm-bindgen` version to a later patch version of the crate, causing a mismatched with your
+installed `wasm-bindgen-cli` version.
 
 Currently, `cargo-leptos` will:
+
 - detect whether you have `wasm-bindgen-cli` installed locally
 - detect the version of `wasm-bindgen` that's in your lockfile
-- download and install a corresponding `wasm-bindgen-cli` version locally if you don't have `wasm-bindgen-cli` installed.
+- download and install a corresponding `wasm-bindgen-cli` version locally if you don't have `wasm-bindgen-cli`
+  installed.
 
-It does *not* download an updated or downgraded version if it finds `wasm-bindgen-cli` installed globally. If you have `wasm-bindgen-cli` installed globally, you will need to manage the verison manually. In the case of a mismatch, `wasm-bindgen-cli` emits an error message with precise instructions on how to either a) upgrade or downgrade `wasm-bindgen-cli` or b) pin the `wasm-bindgen` crate to the corresponding version.
+It does *not* download an updated or downgraded version if it finds `wasm-bindgen-cli` installed globally. If you have
+`wasm-bindgen-cli` installed globally, you will need to manage the verison manually. In the case of a mismatch,
+`wasm-bindgen-cli` emits an error message with precise instructions on how to either a) upgrade or downgrade
+`wasm-bindgen-cli` or b) pin the `wasm-bindgen` crate to the corresponding version.
