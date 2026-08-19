@@ -348,12 +348,12 @@ watch-additional-files = [
     # Or a structure that provides additional control over the watched file behavior
     {
         # The watched paths
-        path = ["additional_styles"],
+        paths = ["additional_styles"],
         # Only watch files with these extensions
-        extension = ["css"],
+        extensions = ["css"],
         # The types of rebuild to trigger when a file changes.
         # Possible values: bin-source, lib-source, asset, style, conf, additional.
-        change-type = ["style"]
+        change-types = ["style"]
     }
 ]
 
