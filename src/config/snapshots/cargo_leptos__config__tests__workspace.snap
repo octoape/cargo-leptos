@@ -45,6 +45,7 @@ Config {
                         site: "pkg/project1.css",
                     },
                 ),
+                bundle: false,
                 browserquery: "defaults",
                 tailwind: None,
                 site_file: SiteFile {
@@ -132,6 +133,7 @@ Config {
                         site: "pkg/project2.css",
                     },
                 ),
+                bundle: false,
                 browserquery: "defaults",
                 tailwind: None,
                 site_file: SiteFile {

@@ -33,6 +33,21 @@ pub async fn style(
     })
 }
 
+/// Use Lightning CSS to bundle the file and the files it imports into a single CSS file.
+fn bundle_css(file: &std::path::Path) -> Result<String> {
+    use lightningcss::{
+        bundler::{Bundler, FileProvider},
+        stylesheet::ParserOptions,
+    };
+
+    let fs = FileProvider::new();
+    let mut bundler = Bundler::new(&fs, None, ParserOptions::default());
+    let stylesheet = bundler
+        .bundle(file)
+        .map_err(|err| eyre!("CSS Bundler Error: {}", err))?;
+    Ok(stylesheet.to_css(PrinterOptions::default())?.code)
+}
+
 fn build_sass(proj: &Arc<Project>) -> JoinHandle<Result<Outcome<String>>> {
     let proj = proj.clone();
     tokio::spawn(async move {
@@ -49,9 +64,11 @@ fn build_sass(proj: &Arc<Project>) -> JoinHandle<Result<Outcome<String>>> {
             Some("sass") | Some("scss") => compile_sass(style_file, proj.release)
                 .await
                 .wrap_err(format!("compile sass/scss: {}", &style_file)),
-            Some("css") => Ok(Outcome::Success(
-                fs::read_to_string(&style_file.source).await.dot()?,
-            )),
+            Some("css") => Ok(Outcome::Success(if proj.style.bundle {
+                bundle_css(style_file.source.as_ref())?
+            } else {
+                fs::read_to_string(&style_file.source).await.dot()?
+            })),
             _ => bail!("Not a css/sass/scss style file: {}", &style_file),
         }
     })

@@ -27,6 +27,7 @@ use tracing::*;
 use walkdir::WalkDir;
 
 const POLLING_TIMEOUT: Duration = Duration::from_millis(100);
+const STYLE_EXTENSIONS: [&str; 3] = ["scss", "sass", "css"];
 
 pub async fn spawn(proj: &Arc<Project>, view_macros: Option<ViewMacros>) -> Result<JoinHandle<()>> {
     let proj = proj.clone();
@@ -187,7 +188,7 @@ fn handle(
 
         if let Some(file) = &proj.style.file {
             let src = file.source.clone().without_last();
-            if path.starts_with(src) && path.is_ext_any(&["scss", "sass", "css"]) {
+            if path.starts_with(src) && path.is_ext_any(&STYLE_EXTENSIONS) {
                 debug!("Notify style change {}", GRAY.paint(path.as_str()));
                 changes.add(Change::Style);
             }
@@ -205,12 +206,26 @@ fn handle(
             }
         }
 
-        if path.starts_with_any(&proj.watch_additional_files) {
-            debug!(
-                "Notify additional file change {}",
-                GRAY.paint(path.as_str())
-            );
-            changes.add(Change::Additional);
+        for watch_additional_file in &proj.watch_additional_files {
+            let extension_matches = if watch_additional_file.extensions.is_empty() {
+                true
+            } else {
+                watch_additional_file.extensions.iter().any(|extension| {
+                    path.extension()
+                        .map(|path_ext| path_ext == extension)
+                        .unwrap_or(false)
+                })
+            };
+
+            if extension_matches && path.starts_with_any(&watch_additional_file.paths) {
+                watch_additional_file
+                    .change_types
+                    .iter()
+                    .for_each(|change| {
+                        debug!("Notify {:?} change {}", change, GRAY.paint(path.as_str()));
+                        changes.add(*change);
+                    });
+            }
         }
     }
 
@@ -237,12 +252,14 @@ impl GitAwareWatcher {
         let mut paths: Vec<_> = proj
             .watch_additional_files
             .iter()
+            .flat_map(|watch| &watch.paths)
             .filter_map(|p| p.canonicalize().ok())
             .collect();
 
         let forced_watch_top_level_paths: HashSet<PathBuf> = proj
             .watch_additional_files
             .iter()
+            .flat_map(|watch| &watch.paths)
             .filter_map(|p| p.canonicalize().ok())
             .collect();
 

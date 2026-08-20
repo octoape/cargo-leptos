@@ -7,6 +7,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct StyleConfig {
     pub file: Option<SourcedSiteFile>,
+    /// whether to bundle CSS files using Lightning CSS
+    pub bundle: bool,
     pub browserquery: String,
     pub tailwind: Option<TailwindConfig>,
     pub site_file: SiteFile,
@@ -35,6 +37,7 @@ impl StyleConfig {
         });
         Ok(Self {
             file: style_file,
+            bundle: config.style_bundle,
             browserquery: config.browserquery.clone(),
             tailwind: TailwindConfig::new(config)?,
             site_file,
