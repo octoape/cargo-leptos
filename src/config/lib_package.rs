@@ -141,7 +141,7 @@ impl LibPackage {
             let source = front_target_paths
                 .rel
                 .join("wasm32-unknown-unknown")
-                .join(profile.to_string())
+                .join(profile.dir_name())
                 .join(target_lib.name.clone())
                 .with_extension("wasm");
             let site = config
