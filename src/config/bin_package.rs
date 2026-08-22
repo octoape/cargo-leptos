@@ -112,7 +112,7 @@ impl BinPackage {
             } else {
                 &name
             };
-            file.join(profile.to_string())
+            file.join(profile.dir_name())
                 .join(name)
                 .with_extension(file_ext)
         };
